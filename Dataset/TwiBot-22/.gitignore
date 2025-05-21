@@ -1,0 +1,8 @@
+.ipynb_checkpoints/*
+
+# Remove the dataset since it is a private dataset
+Twibot-20-Format22/*
+Twibot-20-Format22.zip
+twibot-22.csv.gz
+
+
