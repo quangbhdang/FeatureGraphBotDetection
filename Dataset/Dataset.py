@@ -17,12 +17,11 @@ class Twibot20(Dataset):
     """
     def __init__(self,root=root_path,device='cpu',process=True,save=True):
         """
-        Create a Twibot-20 dataset. The oject take following input
-        - root: where the files is store self.assertTrue(actual, 'message')
+        Create a Twibot-20 dataset.
         """
         self.root = root
         self.device = device
-        self.process=process
+        self.process = process
         if process:
             print(f"Root path {root_path}")
             print('Loading train.json')
@@ -37,7 +36,8 @@ class Twibot20(Dataset):
                     support_data.append(obj)
                     if i % 50000 == 0:  # Every 50K objects
                         print(f"Loaded {i} records...")
-            df_support=pd.DataFrame(support_data)
+            df_support=pd.DataFrame(support_data) # Loading using this method to avoid overloading memory on smaller system
+            # df_support = pd.read_json(root_path + '/Twibot-20/support.json', lines=True, chunk=)
             print('Loading dev.json')
             df_dev=pd.read_json(root_path + '/Twibot-20/dev.json')
             print('Finished')
@@ -54,20 +54,20 @@ class Twibot20(Dataset):
         
     def load_labels(self):
         print('Loading labels...',end='   ')
-        path=self.root+'label.pt'
+        path=self.root+'/Twibot-20/processed_data/label.pt'
         if not os.path.exists(path):
             labels=torch.LongTensor(self.df_data_labeled['label']).to(self.device)
             if self.save:
-                torch.save(labels,'./Data/label.pt')
+                torch.save(labels,root_path + '/Twibot-20/proccessed_data/label.pt')
         else:
-            labels=torch.load(self.root+"label.pt").to(self.device)
+            labels=torch.load(self.root + "/Twibot-20/processed_data/label.pt").to(self.device)
         print('Finished')
         
         return labels
     
     def Des_Preprocess(self):
         print('Loading raw feature1...',end='   ')
-        path=self.root+'description.npy'
+        path=self.root+'/Twibot-20/description.npy'
         if not os.path.exists(path):
             description=[]
             for i in range (self.df_data.shape[0]):
@@ -85,9 +85,9 @@ class Twibot20(Dataset):
 
     def Des_embbeding(self):
         print('Running feature1 embedding')
-        path=self.root+"des_tensor.pt"
+        path=self.root+"/Twibot-20/processed_data/des_tensor.pt"
         if not os.path.exists(path):
-            description=np.load(self.root+'description.npy',allow_pickle=True)
+            description=np.load(self.root+'/Twibot-20/description.npy',allow_pickle=True)
             print('Loading RoBerta')
             feature_extraction = pipeline('feature-extraction', model="distilroberta-base", tokenizer="distilroberta-base",device=0)
             des_vec=[]
@@ -105,15 +105,15 @@ class Twibot20(Dataset):
                     #print('[{:>6d}/229580]'.format(j+1))
             des_tensor=torch.stack(des_vec,0).to(self.device)
             if self.save:
-                torch.save(des_tensor,'./Data/des_tensor.pt')
+                torch.save(des_tensor,root_path + '/Twibot-20/processed_data/des_tensor.pt')
         else:
-            des_tensor=torch.load(self.root+"des_tensor.pt").to(self.device)
+            des_tensor=torch.load(self.root+"/Twibot-20/processed_data/des_tensor.pt").to(self.device)
         print('Finished')
         return des_tensor
     
     def tweets_preprocess(self):
         print('Loading raw feature2...',end='   ')
-        path=self.root+'tweets.npy'
+        path=self.root+'/Twibot-20/processed_data/tweets.npy'
         if not os.path.exists(path):
             tweets=[]
             for i in range (self.df_data.shape[0]):
@@ -134,9 +134,9 @@ class Twibot20(Dataset):
     
     def tweets_embedding(self):
         print('Running feature2 embedding')
-        path=self.root+"tweets_tensor.pt"
+        path=self.root+"/Twibot-20/processed_data/tweets_tensor.pt"
         if not os.path.exists(path):
-            tweets=np.load("./Data/tweets.npy",allow_pickle=True)
+            tweets=np.load("tweets.npy",allow_pickle=True)
             print('Loading RoBerta')
             feature_extract=pipeline('feature-extraction',model='roberta-base',tokenizer='roberta-base',device=0,padding=True, truncation=True,max_length=500, add_special_tokens = True)
             tweets_list=[]
@@ -155,19 +155,19 @@ class Twibot20(Dataset):
                         total_each_person_tweets+=total_word_tensor
                 total_each_person_tweets/=len(each_person_tweets)
                 tweets_list.append(total_each_person_tweets)
-                #if (i%500==0):
-                    #print('[{:>6d}/229580]'.format(i+1))
+                if (i%500==0):
+                    print('[{:>6d}/229580]'.format(i+1))
             tweet_tensor=torch.stack(tweets_list).to(self.device)
             if self.save:
                 torch.save(tweet_tensor,path)
         else:
-            tweets_tensor=torch.load(self.root+"tweets_tensor.pt").to(self.device)
+            tweets_tensor=torch.load(self.root+"/Twibot-20/processed_data/tweets_tensor.pt").to(self.device)
         print('Finished')
         return tweets_tensor
     
     def num_prop_preprocess(self):
         print('Processing feature3...',end='   ')
-        path0=self.root+'num_properties_tensor.pt'
+        path0=self.root+'/Twibot-20/processed_data/num_properties_tensor.pt'
         if not os.path.exists(path0):
             path=self.root
             if not os.path.exists(path+"followers_count.pt"):
@@ -268,16 +268,16 @@ class Twibot20(Dataset):
             num_prop=torch.cat((followers_count.reshape([229580,1]),friends_count.reshape([229580,1]),favourites_count.reshape([229580,1]),statuses_count.reshape([229580,1]),screen_name_length_days.reshape([229580,1]),active_days.reshape([229580,1])),1).to(self.device)
 
             if self.save:
-                torch.save(num_prop,"./Data/num_properties_tensor.pt")
+                torch.save(num_prop,self.root + "/Twibot-20/processed_data/num_properties_tensor.pt")
             
         else:
-            num_prop=torch.load(self.root+"num_properties_tensor.pt").to(self.device)
+            num_prop=torch.load(self.root+"/Twibot-20/processed_data/num_properties_tensor.pt").to(self.device)
         print('Finished')
         return num_prop
     
     def cat_prop_preprocess(self):
         print('Processing feature4...',end='   ')
-        path=self.root+'cat_properties_tensor.pt'
+        path=self.root+'/Twibot-20/processed_data/cat_properties_tensor.pt'
         if not os.path.exists(path):
             category_properties=[]
             properties=['protected','geo_enabled','verified','contributors_enabled','is_translator','is_translation_enabled','profile_background_tile','profile_use_background_image','has_extended_profile','default_profile','default_profile_image']
@@ -299,15 +299,15 @@ class Twibot20(Dataset):
                 category_properties.append(prop)
             category_properties=torch.tensor(np.array(category_properties,dtype=np.float32)).to(self.device)
             if self.save:
-                torch.save(category_properties,self.root+'cat_properties_tensor.pt')
+                torch.save(category_properties,self.root+'/Twibot-20/processed_data/cat_properties_tensor.pt')
         else:
-            category_properties=torch.load(self.root+"cat_properties_tensor.pt").to(self.device)
+            category_properties=torch.load(self.root+"/Twibot-20/processed_data/cat_properties_tensor.pt").to(self.device)
         print('Finished')
         return category_properties
     
     def Build_Graph(self):
         print('Building graph',end='   ')
-        path=self.root+'edge_index.pt'
+        path=self.root+'/Twibot-20/processed_data/edge_index.pt'
         if not os.path.exists(path):
             id2index_dict={id:index for index,id in enumerate(self.df_data['ID'])}
             edge_index=[]
@@ -335,11 +335,11 @@ class Twibot20(Dataset):
             edge_index=torch.tensor(edge_index,dtype=torch.long).t().contiguous().to(self.device)
             edge_type=torch.tensor(edge_type,dtype=torch.long).to(self.device)
             if self.save:
-                torch.save(edge_index,self.root+"edge_index.pt")
-                torch.save(edge_type,self.root+"edge_type.pt")
+                torch.save(edge_index,self.root+"/Twibot-20/processed_data/edge_index.pt")
+                torch.save(edge_type,self.root+"/Twibot-20/processed_data/edge_type.pt")
         else:
-            edge_index=torch.load(self.root+"edge_index.pt").to(self.device)
-            edge_type=torch.load(self.root+"edge_type.pt").to(self.device)
+            edge_index=torch.load(self.root+"/Twibot-20/processed_data/edge_index.pt").to(self.device)
+            edge_type=torch.load(self.root+"/Twibot-20/processed_data/edge_type.pt").to(self.device)
             print('Finished')
         return edge_index,edge_type
     
@@ -363,3 +363,119 @@ class Twibot20(Dataset):
         train_idx,val_idx,test_idx=self.train_val_test_mask()
         return des_tensor,tweets_tensor,num_prop,category_prop,edge_index,edge_type,labels,train_idx,val_idx,test_idx
     
+
+class Instafake(Dataset):
+    """
+    Data loader for Instafake dataset based on the repo: https://github.com/fcakyon/instafake-dataset/tree/master/data
+    """
+    def __init__(self, root, dataset_version, device='cpu', process=True):
+        self.root = os.path.join(root, "instafake-dataset/data")
+        self.device = device
+
+        data_dict = self._import_data(self.root, dataset_version)
+        self.dataset_type = data_dict["dataset_type"]
+        self.dataframe = data_dict["dataframe"]
+
+        # Preprocess dataframe (e.g., normalize, fillna)
+        if process:
+            self._preprocess()
+
+        # Prepare tensors
+        self.features, self.labels = self._prepare_tensors()
+
+    def __len__(self):
+        return len(self.features)
+
+    def __getitem__(self, idx):
+        return self.features[idx], self.labels[idx]
+
+    def _preprocess(self):
+        # Example: fill NaNs with 0
+        self.dataframe = self.dataframe.fillna(0)
+
+    def _prepare_tensors(self):
+        df = self.dataframe
+
+        if self.dataset_type == "automated":
+            label_col = "automated_behaviour"
+        elif self.dataset_type == "fake":
+            label_col = "is_fake"
+        else:
+            raise ValueError("Unknown dataset type")
+
+        features = df.drop(columns=[label_col]).astype(float).values
+        labels = df[label_col].astype(int).values
+
+        features_tensor = torch.tensor(features, dtype=torch.float32).to(self.device)
+        labels_tensor = torch.tensor(labels, dtype=torch.long).to(self.device)
+
+        return features_tensor, labels_tensor
+
+    def _create_dataframe(self, account_data_list, dataset_type):
+        rows = []
+        for account_data in account_data_list:
+            user_follower_count = account_data["userFollowerCount"]
+            user_following_count = account_data["userFollowingCount"]
+            follower_following_ratio = user_follower_count / max(1, user_following_count)
+
+            if dataset_type == "automated":
+                row = {
+                    "user_media_count": account_data["userMediaCount"],
+                    "user_follower_count": user_follower_count,
+                    "user_following_count": user_following_count,
+                    "user_has_highligh_reels": account_data["userHasHighlighReels"],
+                    "user_has_external_url": account_data["userHasExternalUrl"],
+                    "user_tags_count": account_data["userTagsCount"],
+                    "follower_following_ratio": follower_following_ratio,
+                    "user_biography_length": account_data["userBiographyLength"],
+                    "username_length": account_data["usernameLength"],
+                    "username_digit_count": account_data["usernameDigitCount"],
+                    "media_comment_numbers": account_data["mediaCommentNumbers"],
+                    "media_comments_are_disabled": account_data["mediaCommentNumbers"],
+                    "media_has_location_info": account_data["mediaHasLocationInfo"],
+                    "media_hashtag_numbers": account_data["mediaHashtagNumbers"],
+                    "media_like_numbers": account_data["mediaLikeNumbers"],
+                    "mediaUpload_times": account_data["mediaUploadTimes"],
+                    "automated_behaviour": account_data["automatedBehaviour"]
+                }
+            elif dataset_type == "fake":
+                row = {
+                    "user_media_count": account_data["userMediaCount"],
+                    "user_follower_count": user_follower_count,
+                    "user_following_count": user_following_count,
+                    "user_has_profil_pic": account_data["userHasProfilPic"],
+                    "user_is_private": account_data["userIsPrivate"],
+                    "follower_following_ratio": follower_following_ratio,
+                    "user_biography_length": account_data["userBiographyLength"],
+                    "username_length": account_data["usernameLength"],
+                    "username_digit_count": account_data["usernameDigitCount"],
+                    "is_fake": account_data["isFake"]
+                }
+            rows.append(row)
+
+        return pd.DataFrame(rows)
+
+    def _import_data(self, dataset_path, dataset_version):
+        dataset_type = re.findall("automated|fake", dataset_version)[0]
+
+        if dataset_type == "automated":
+            with open(os.path.join(dataset_path, dataset_version, "automatedAccountData.json")) as f:
+                automated_data = json.load(f)
+            with open(os.path.join(dataset_path, dataset_version, "nonautomatedAccountData.json")) as f:
+                nonautomated_data = json.load(f)
+
+            df_automated = self._create_dataframe(automated_data, dataset_type)
+            df_nonautomated = self._create_dataframe(nonautomated_data, dataset_type)
+            df_merged = pd.concat([df_automated, df_nonautomated], ignore_index=True)
+
+        elif dataset_type == "fake":
+            with open(os.path.join(dataset_path, dataset_version, "fakeAccountData.json")) as f:
+                fake_data = json.load(f)
+            with open(os.path.join(dataset_path, dataset_version, "realAccountData.json")) as f:
+                real_data = json.load(f)
+
+            df_fake = self._create_dataframe(fake_data, dataset_type)
+            df_real = self._create_dataframe(real_data, dataset_type)
+            df_merged = pd.concat([df_fake, df_real], ignore_index=True)
+
+        return {"dataset_type": dataset_type, "dataframe": df_merged}
