@@ -1,0 +1,6 @@
+outs:
+- md5: 6480cf14334c7aeb5228af02f6172779.dir
+  size: 7768930
+  nfiles: 4
+  hash: md5
+  path: InstaFake
