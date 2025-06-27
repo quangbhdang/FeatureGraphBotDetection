@@ -1,2 +1,4 @@
-# Ignore all dataset follder
-./Dataset/*
+# Ignore subnotebooks
+/Notebooks
+# Ignore Dataset folder this is tracked by DVC
+/Dataset

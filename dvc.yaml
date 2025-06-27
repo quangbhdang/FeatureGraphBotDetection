@@ -1,0 +1,9 @@
+stages:
+  instafake-preprocess:
+    cmd: python Src/preprocess_instafake.py
+    deps:
+    - Dataset/InstaFake/raw/faked-v1.0/fakeAccountData.json
+    - Dataset/InstaFake/raw/faked-v1.0/realAccountData.json
+    - Src/preprocess_instafake.py
+    outs:
+    - Dataset/InstaFake/interim/combined_account_data.csv

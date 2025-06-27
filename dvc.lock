@@ -1,0 +1,22 @@
+schema: '2.0'
+stages:
+  instafake-preprocess:
+    cmd: python Src/preprocess_instafake.py
+    deps:
+    - path: Dataset/InstaFake/raw/faked-v1.0/fakeAccountData.json
+      hash: md5
+      md5: 60243d316ba97b0604aab0c7643516a9
+      size: 40874
+    - path: Dataset/InstaFake/raw/faked-v1.0/realAccountData.json
+      hash: md5
+      md5: d7f693e14b3963d1d52066669e3ce94c
+      size: 204941
+    - path: Src/preprocess_instafake.py
+      hash: md5
+      md5: d65c001a72cbe29b8dedaec5472726c2
+      size: 3092
+    outs:
+    - path: Dataset/InstaFake/interim/combined_account_data.csv
+      hash: md5
+      md5: 2770ed53b195c440fba589d9b2866d50
+      size: 31045
