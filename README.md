@@ -11,8 +11,6 @@ Since LLM bots have become much more challenging to identify within social media
 
 Our assumption is as follow bot messages, comments, and feedback will be generated using LLM models. For other bot features, they will be largely untouchable as it assumes that this bot will still utilise existing infrastructure, thus not shift two much from an actual user.
 
-Alternative is using MCP and n8n, our team purchased bot accounts to obtain they logs and data of intereaction in attempt to replicate the behaviour in 
-
 # How to run
 
 This project uses Make and DVC for reproducible data science workflows. Follow these steps to set up and run the bot detection pipeline.
