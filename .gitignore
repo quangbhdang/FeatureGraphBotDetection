@@ -2,3 +2,6 @@
 /Notebooks
 # Ignore Dataset folder this is tracked by DVC
 /Dataset
+
+# Ignore local configuration files
+.vscode/

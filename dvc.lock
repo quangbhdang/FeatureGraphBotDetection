@@ -13,10 +13,10 @@ stages:
       size: 204941
     - path: Src/preprocess_instafake.py
       hash: md5
-      md5: 4b6072c003cfbc071e6552871a098eb0
-      size: 3088
+      md5: 0b497b4936eae5573799fdffec8c30e2
+      size: 2920
     outs:
     - path: Dataset/InstaFake/interim/combined_account_data.csv
       hash: md5
-      md5: 2770ed53b195c440fba589d9b2866d50
-      size: 31045
+      md5: b27e21ca4251c0ded13a4a6a74223618
+      size: 28651

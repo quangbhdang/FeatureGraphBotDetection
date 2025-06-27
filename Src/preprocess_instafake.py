@@ -70,9 +70,6 @@ if __name__ == "__main__":
     real_file_path = find_json_files(DATA_DIR, REAL_ACCOUNT_FILES)
     real_account_df = load_json(real_file_path, safe_load=True)
 
-    # Combine datasets and label them
-    fake_account_df["label"] = "1"  # Label fake accounts as '1'
-    real_account_df["label"] = "0"  # Label real accounts as '0'
     print("Combining datasets...")
     combined_df = pd.concat([fake_account_df, real_account_df], ignore_index=True)
     # Shuffle the combined DataFrame to ensure randomness
