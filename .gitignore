@@ -5,3 +5,4 @@
 
 # Ignore local configuration files
 .vscode/
+*.code-workspace

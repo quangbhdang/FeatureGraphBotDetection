@@ -6,10 +6,11 @@ A repo for group work on bot detection research and implementation
 
 Since LLM bots have become much more challenging to identify within social media networks. Our research will focus on identifying LLM-driven bots within social media networks. The practical application of this is spam detection, scam prevention and reducing coordinated media manipulation using LLM agentic bots.
 
+# For the dataset
 
-# How the bot is created
+You can obtain the dataset for InstaFake at the author Github repo [https://github.com/fcakyon/instafake-dataset]. Please ensure you place unzip version of both subdirectory of the dataset in the raw folder of InstaFake.
 
-Our assumption is as follow bot messages, comments, and feedback will be generated using LLM models. For other bot features, they will be largely untouchable as it assumes that this bot will still utilise existing infrastructure, thus not shift two much from an actual user.
+For the TwiBot-20 you can follow the guide from the dataset author [https://github.com/BunsenFeng/TwiBot-20] to obtain access to the data. Place the zip file in the raw folder as shown in the project folder of this repo.
 
 # How to run
 
@@ -20,6 +21,8 @@ This project uses Make and DVC for reproducible data science workflows. Follow t
 - **Conda** (Anaconda or Miniconda)
 - **Git**
 - **DVC** (Data Version Control)
+
+The dependencies and virtual environment is control by conda to ensure simple replication of the finding results.
 
 ## Quick Start
 
@@ -74,7 +77,7 @@ make train
 
 | Command | Description |
 |---------|-------------|
-| `make recreate-env` | Create conda environment and initialize DVC |
+| `make recreate-env` | Create conda environment from provided `environment.yml`|
 | `make create-user-notebook` | Create a personal Jupyter notebook |
 | `make setup-dvc-preprocess-pipeline` | Set up DVC pipeline for data preprocessing |
 | `make run-preprocess-instafake` | Run the preprocessing pipeline |

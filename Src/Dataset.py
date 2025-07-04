@@ -4,6 +4,7 @@ import pandas as pd
 import ijson
 import json
 import os
+from pathlib import Path
 from transformers import pipeline
 from datetime import datetime as dt
 from torch.utils.data import Dataset
@@ -45,7 +46,6 @@ class Twibot20(Dataset):
             df_support = pd.DataFrame(
                 support_data
             )  # Loading using this method to avoid overloading memory on smaller system
-            # df_support = pd.read_json(root_path + '/Twibot-20/support.json', lines=True, chunk=)
             print("Loading dev.json")
             df_dev = pd.read_json(root_path + "/Twibot-20/dev.json")
             print("Finished")
@@ -592,12 +592,9 @@ class Instafake(Dataset):
     """
 
     def __init__(self, root, dataset_version, device="cpu", process=True):
-        self.root = os.path.join(root, "instafake-dataset/data")
+        self.root = Path(root).parents / "Dataset/InstaFake/interim"
         self.device = device
-
-        data_dict = self._import_data(self.root, dataset_version)
-        self.dataset_type = data_dict["dataset_type"]
-        self.dataframe = data_dict["dataframe"]
+        self.df = pd.read_csv(self.root / "combined_account_data.csv", engine="pyarrow")
 
         # Preprocess dataframe (e.g., normalize, fillna)
         if process:
